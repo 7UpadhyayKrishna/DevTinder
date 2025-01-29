@@ -2,6 +2,7 @@ const express = require("express");
 const connectdb = require("./config/database");
 const User = require("./models/user");
 const app = express();
+const validateSignUpData = require("./utils/validation");
 
 app.use(express.json()); //middleware for reading jason file
 
@@ -64,12 +65,15 @@ app.get("/user", async (req, res) => {
 app.post("/signup", async (req, res) => {
   // console.log(req.body);
 
-  const user = new User(req.body);
   try {
+    //validate
+    validateSignUpData(req);
+
+    const user = new User(req.body);
     await user.save();
     res.send("data saved");
   } catch (err) {
-    res.status(400).send("data not saved");
+    res.status(400).send("data not saved : " + err.message);
   }
 });
 
